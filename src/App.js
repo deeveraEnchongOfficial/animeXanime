@@ -4,44 +4,72 @@ import MovieCard from "./MovieCard";
 import SearchIcon from "./search.svg";
 import "./App.css";
 
-const API_URL = "http://www.omdbapi.com?apikey=123f03ea";
+
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [movies, setMovies] = useState([]);
+
+  const [endPoint, setEndPoint] = useState('')
+  const [container, setContainer] = useState([])
+
 
   useEffect(() => {
-    searchMovies("Batman");
-  }, []);
+    fetchMe()
+  },[endPoint])
 
-  const searchMovies = async (title) => {
-    const response = await fetch(`${API_URL}&s=${title}`);
-    const data = await response.json();
+  const fetchMe = () => {
 
-    setMovies(data.Search);
+  
+  const options = {
+    method: 'GET',
+    headers: {
+      'X-RapidAPI-Key': '12c795e279msh29d4f743dcc07e4p1f75fbjsnb5ac1f6edd91',
+      'X-RapidAPI-Host': 'anime-db.p.rapidapi.com'
+    }
   };
+  
+  fetch(`https://anime-db.p.rapidapi.com/anime?page=1&size=10&search=+${endPoint}`, options)
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      setContainer(data.data)
+    })
+    .catch(err => console.error(err));
+  }
+
+
+    const onChangeHandler = (e) => {
+      setEndPoint(e.target.value)
+    }
+
+    const onSubmitHandler = (e) => {
+      e.preventDefault()
+    }
+
+
 
   return (
     <div className="app">
-      <h1>MovieZone</h1>
+      <h1>animeXanime</h1>
 
       <div className="search">
         <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={endPoint}
+          onChange={onChangeHandler}
           placeholder="Search for movies"
         />
         <img
           src={SearchIcon}
           alt="search"
-          onClick={() => searchMovies(searchTerm)}
+          onClick={onSubmitHandler}
         />
       </div>
 
-      {movies?.length > 0 ? (
+      {container?.length > 0 ? (
         <div className="container">
-          {movies.map((movie, key) => (
-            <MovieCard  key={key} movie={movie} />
+          {container.map((item, key) => (
+            // <img src={container.image} alt="logo"/>
+            <MovieCard  key={key} anime={item} />
           ))}
         </div>
       ) : (
